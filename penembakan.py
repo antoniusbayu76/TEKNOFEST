@@ -3,6 +3,7 @@ import numpy as np
 
 vid = cv2.VideoCapture(0)
 prevCir = None
+shoot = 15
 dist = lambda x1,y1,x2,y2: (x1-x2)**2*(y1-y2)**2
 
 while True:
@@ -15,7 +16,9 @@ while True:
     circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 1.2, 200,
                                param1=110, param2=50, minRadius=75, maxRadius=400)
     
-    
+    cv2.line(frame, (0,frame.shape[0]//2), (frame.shape[1],frame.shape[0]//2), (0,0,0), thickness=2)
+    cv2.line(frame, (frame.shape[1]//2,0), (frame.shape[1]//2,frame.shape[0]), (0,0,0), thickness=2)
+    cv2.circle(frame, (frame.shape[1]//2,frame.shape[0]//2),shoot,(0,0,255),3)
     
     if circles is not None:
         circles = np.uint16(np.around(circles))
@@ -29,8 +32,19 @@ while True:
         cv2.circle(frame, (chosen[0],chosen[1]),1,(0,255,0),3)
         cv2.circle(frame, (chosen[0],chosen[1]),chosen[2],(0,0,255),3)
         prevCir = chosen
-        print("x =", chosen[0])
-        print("y =", chosen[1])
+
+        if chosen[0] > frame.shape[1]//2 - shoot and chosen[0] < frame.shape[1]//2 + shoot and chosen[1] > frame.shape[0]//2 - shoot and chosen[1] < frame.shape[0]//2 + shoot:
+            print("tembakkkkkkk")
+        if chosen[0] < frame.shape[1]//2 - shoot :
+            print("kaaaaaaaaaaaaaaaaaanan")
+        elif chosen[0] > frame.shape[1]//2 + shoot :
+            print("kiiiiiiiiiiiiiiiiiiri")
+        if chosen[1] < frame.shape[0]//2 - shoot :
+            print("tuuuuuuuuuuuuuuuuurun")
+        elif chosen[1] > frame.shape[0]//2 + shoot :
+            print("naiiiiiiiiiiiiiiiiiiik")
+        # print("x =", chosen[0])
+        # print("y =", chosen[1])
     cv2.imshow("frame",frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
