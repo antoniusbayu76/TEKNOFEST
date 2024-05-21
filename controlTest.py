@@ -1,40 +1,82 @@
-"""
-Example of how to send MANUAL_CONTROL messages to the autopilot using
-pymavlink.
-This message is able to fully replace the joystick inputs.
-"""
-
-# Import mavutil
 from pymavlink import mavutil
+import time
 
-# Create the connection
-master = mavutil.mavlink_connection("COM6", baud=115200)
-# Wait a heartbeat before sending commands
-master.wait_heartbeat()
-print("Heartbeat from system (system %u component %u)"%
-      (master.target_system,master.target_component))
+# Connect to the Pixhawk via serial port
+connection = mavutil.mavlink_connection('COM7', baud=115200)
 
-# Send a positive x value, negative y, negative z,
-# positive rotation and no button.
-# https://mavlink.io/en/messages/common.html#MANUAL_CONTROL
-# Warning: Because of some legacy workaround, z will work between [0-1000]
-# where 0 is full reverse, 500 is no output and 1000 is full throttle.
-# x,y and r will be between [-1000 and 1000].
-master.mav.manual_control_send(
-    master.target_system,
-    500,
-    -500,
-    250,
-    500,
-    0)
+# Wait for the heartbeat from Pixhawk
+connection.wait_heartbeat()
+print("Heartbeat received")
 
-# To active button 0 (first button), 3 (fourth button) and 7 (eighth button)
-# It's possible to check and configure this buttons in the Joystick menu of QGC
-# buttons = 1 + 1 << 3 + 1 << 7
-# master.mav.manual_control_send(
-#     master.target_system,
-#     0,
-#     0,
-#     500, # 500 means neutral throttle
-#     0,
-#     buttons)
+# Function to send arm command
+def arm_vehicle():
+    # Create the command to arm the vehicle
+    # connection.mav.command_long_send(
+    #     connection.target_system, 
+    #     connection.target_component,
+    #     mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+    #     0,
+    #     1, 0, 0, 0, 0, 0, 0
+    # )
+    connection.arducopter_arm()
+    connection.arducopter_arm()
+    # connection.arducopter_arm()
+    # Wait until the vehicle is armed
+    msg = connection.recv_match(type='COMMAND_ACK',blocking=True)
+    print(msg)
+    connection.motors_armed_wait()
+    print("Vehicle armed")
+
+# Function to send disarm command
+def disarm_vehicle():
+    # Create the command to disarm the vehicle
+    connection.mav.command_long_send(
+        connection.target_system,
+        connection.target_component,
+        mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+        0,
+        0, 0, 0, 0, 0, 0, 0
+    )
+    # Wait until the vehicle is disarmed
+    connection.motors_disarmed_wait()
+    print("Vehicle disarmed")
+
+# Function to send manual control commands
+def send_manual_control(x, y, z, r):
+    """
+    Send a manual control command to the Pixhawk for ArduSub.
+
+    x, y, z: Translational axes, usually range from -1000 to 1000.
+    r: Rotational axis (yaw), usually range from -1000 to 1000.
+    """
+    connection.mav.manual_control_send(
+        connection.target_system,
+        500,
+        -500,
+        250,
+        500,
+        0)
+
+# Example usage: arming the vehicle and running the thruster
+try:
+    arm_vehicle()
+    
+    print("hore")
+    while True:
+        # Run thruster at half power forward (adjust the values as needed)
+        send_manual_control(500, 0, 500, 0)
+        print("test")
+        time.sleep(1)
+        
+        # Optionally, stop the thruster
+        # send_manual_control(0, 0, 500, 0)
+        # time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Manual control interrupted by user")
+
+finally:
+    # Stop thruster and disarm vehicle on exit
+    send_manual_control(0, 0, 500, 0)
+    disarm_vehicle()
+    print("Thruster stopped and vehicle disarmed")
