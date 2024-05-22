@@ -43,18 +43,13 @@ def disarm_vehicle():
 
 # Function to send manual control commands
 def send_manual_control(x, y, z, r):
-    """
-    Send a manual control command to the Pixhawk for ArduSub.
-
-    x, y, z: Translational axes, usually range from -1000 to 1000.
-    r: Rotational axis (yaw), usually range from -1000 to 1000.
-    """
+    
     connection.mav.manual_control_send(
         connection.target_system,
-        500,
-        -500,
-        250,
-        500,
+        -500, #-1000 - 1000
+        0, #-1000 - 1000
+        500, # 0 - 1000
+        500, #-1000 - 1000
         0)
 
 # Example usage: arming the vehicle and running the thruster
@@ -78,5 +73,5 @@ except KeyboardInterrupt:
 finally:
     # Stop thruster and disarm vehicle on exit
     send_manual_control(0, 0, 500, 0)
-    disarm_vehicle()
-    print("Thruster stopped and vehicle disarmed")
+    # disarm_vehicle()
+    # print("Thruster stopped and vehicle disarmed")
