@@ -1,11 +1,16 @@
 import cv2
 import numpy as np
+import pidControl as ct
 
 vid = cv2.VideoCapture(0)
 prevCir = None
 shoot = 15
 scalling = 1
 dist = lambda x1,y1,x2,y2: (x1-x2)**2*(y1-y2)**2
+
+setArea = 0
+minArea = 0
+maxArea = 0
 
 def rescale(frame, scale=0.75):
     width = int(frame.shape[1] * scale)
@@ -15,6 +20,11 @@ def rescale(frame, scale=0.75):
 
 lower = np.array([20, 100, 100])
 upper = np.array([30, 255, 255])
+
+try:
+    ct.arm_vehicle()
+except:    
+    print("Ga Bisa Arming")
 
 while True:
     ret, frame = vid.read()
@@ -47,18 +57,28 @@ while True:
         cv2.circle(frame, (chosen[0],chosen[1]),chosen[2],(0,0,255),3)
         prevCir = chosen
 
-        if chosen[0] > frame.shape[1]//2 - shoot and chosen[0] < frame.shape[1]//2 + shoot and chosen[1] > frame.shape[0]//2 - shoot and chosen[1] < frame.shape[0]//2 + shoot:
-            print("tembakkkkkkk")
-        if chosen[0] < frame.shape[1]//2 - shoot :
-            print("kaaaaaaaaaaaaaaaaaanan")
-        elif chosen[0] > frame.shape[1]//2 + shoot :
-            print("kiiiiiiiiiiiiiiiiiiri")
-        if chosen[1] < frame.shape[0]//2 - shoot :
-            print("tuuuuuuuuuuuuuuuuurun")
-        elif chosen[1] > frame.shape[0]//2 + shoot :
-            print("naiiiiiiiiiiiiiiiiiiik")
-        # print("x =", chosen[0])
-        # print("y =", chosen[1])
+        xAxis = 0
+        yAxis = chosen[0]
+        zAxis = chosen[1]
+
+        ct.send_manual_control(xAxis,yAxis,zAxis,setArea,frame.shape[1]//2,frame.shape[0]//2,minArea,maxArea,0,frame.shape[1],0,frame.shape[0])
+
+
+        # if chosen[0] > frame.shape[1]//2 - shoot and chosen[0] < frame.shape[1]//2 + shoot and chosen[1] > frame.shape[0]//2 - shoot and chosen[1] < frame.shape[0]//2 + shoot:
+        #     print("tembakkkkkkk")
+        # if chosen[0] < frame.shape[1]//2 - shoot :
+        #     print("kaaaaaaaaaaaaaaaaaanan")
+        # elif chosen[0] > frame.shape[1]//2 + shoot :
+        #     print("kiiiiiiiiiiiiiiiiiiri")
+        # if chosen[1] < frame.shape[0]//2 - shoot :
+        #     print("tuuuuuuuuuuuuuuuuurun")
+        # elif chosen[1] > frame.shape[0]//2 + shoot :
+        #     print("naiiiiiiiiiiiiiiiiiiik")
+        # # print("x =", chosen[0])
+        # # print("y =", chosen[1])
+
+
+
     cv2.imshow("frame",frame)
     cv2.imshow("mask",mask)
 
