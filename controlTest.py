@@ -46,10 +46,10 @@ def send_manual_control(x, y, z, r):
     
     connection.mav.manual_control_send(
         connection.target_system,
-        -500, #-1000 - 1000
-        0, #-1000 - 1000
-        500, # 0 - 1000
-        500, #-1000 - 1000
+        x, #-1000 - 1000
+        y, #-1000 - 1000
+        z, # 0 - 1000
+        r, #-1000 - 1000
         0)
 
 # Example usage: arming the vehicle and running the thruster
@@ -69,9 +69,3 @@ try:
 
 except KeyboardInterrupt:
     print("Manual control interrupted by user")
-
-finally:
-    # Stop thruster and disarm vehicle on exit
-    send_manual_control(0, 0, 500, 0)
-    # disarm_vehicle()
-    # print("Thruster stopped and vehicle disarmed")
