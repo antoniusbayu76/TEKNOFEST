@@ -10,6 +10,7 @@ Kp = 0.1
 Ki = 0.1
 Kd = 0.1
 
+nyelam = 0 #state nyelam
 
 xPrev = 0
 yPrev = 0
@@ -105,7 +106,7 @@ def send_manual_control(area, cx, cy, setx, sety, setz, minArea, maxArea, minFra
         connection.target_system,
         ux, #-1000 - 1000
         uy, #-1000 - 1000
-        uz, # 0 - 1000
+        nyelam + uz, # 0 - 1000
         0, #-1000 - 1000
         0)
     
