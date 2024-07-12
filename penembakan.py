@@ -8,9 +8,9 @@ shoot = 15
 scalling = 1
 dist = lambda x1,y1,x2,y2: (x1-x2)**2*(y1-y2)**2
 
-setArea = 0
-minArea = 0
-maxArea = 0
+setArea = 0 #luas target pas nembak
+minArea = 0 #luas max target yang bisa dibaca
+maxArea = 0 #luas min target yang bisa dibaca
 
 def rescale(frame, scale=0.75):
     width = int(frame.shape[1] * scale)
@@ -18,8 +18,8 @@ def rescale(frame, scale=0.75):
     dimensions = (width, height)
     return cv2.resize(frame, dimensions, interpolation=cv2.INTER_AREA)
 
-lower = np.array([20, 100, 100])
-upper = np.array([30, 255, 255])
+lower = np.array([100, 0, 237])
+upper = np.array([113, 255, 255])
 
 try:
     ct.arm_vehicle()
