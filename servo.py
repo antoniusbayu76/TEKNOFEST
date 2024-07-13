@@ -28,13 +28,15 @@ def move_continuous_servo(channel, pwm_value):
 # time.sleep(5)
 try :
     while True :
-        move_continuous_servo(9,1300)
+        # move_continuous_servo(9,1300)
+        move_continuous_servo(11,1900)
         print("1300")
         time.sleep(1)
 
 except KeyboardInterrupt :
 # Berhentikan servo dengan mengirimkan nilai tengah
-    move_continuous_servo(9, 1500)
+    # move_continuous_servo(9, 1500)
+    move_continuous_servo(11, 1500)
     print("stop")
 
 # # Tunggu beberapa saat agar servo berhenti
